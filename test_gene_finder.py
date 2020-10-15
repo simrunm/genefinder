@@ -24,6 +24,8 @@ get_complement_cases = [
 get_reverse_complement_cases = [
     # Check a single nucleotide, which should be the same as the complement.
     ("A", "T"),
+    # Check that the strand is reversed.
+    ("ATG", "CAT"),
 ]
 
 rest_of_orf_cases = [
@@ -33,6 +35,11 @@ rest_of_orf_cases = [
     ("ATGAAA", "ATGAAA"),
     # Check a case without a stop codon where the length is not a multiple of 3.
     ("ATGA", "ATGA"),
+    # Check to make sure it doesn't count stop codons that are
+    # not in multiples of 3.
+    ("ATGATGATTTGA", "ATGATGATT"),
+    # Check a case with a stop codon where the length is not a multiple 3.
+    ("ATGTGAA", "ATG"),
 ]
 
 find_all_orfs_one_frame_cases = [
@@ -40,23 +47,42 @@ find_all_orfs_one_frame_cases = [
     ("ATGTGA", ["ATG"]),
     # Check a strand with two ORFs.
     ("ATGTAAATGAAATAA", ["ATG", "ATGAAA"]),
+    # Check a strand with a nested ORF that doesn't start with a start codon.
+    ("AATATGATGAAATGA", ["ATGATGAAA"]),
+    # Check a strand with no ORFs.
+    ("AAAAAAAA", []),
+    # Check multiple start followed by stop codons with one nested ORF.
+    ("ATGATGTGAATGTGA", ["ATGATG", "ATG"]),
+    # Check a strand that ends with a start codon.
+    ("ATGAATTGAATG", ["ATGAAT", "ATG"]),
+    # Check a strand with one ORF in frame and one ORF out of frame.
+    ("ATGTGAAATGTGA", ["ATG"]),
 ]
 
 find_all_orfs_cases = [
     # This case from find_all_orfs has no ORFs in other frames, so it should
     # return the same result as in the one_frame case.
     ("ATGTAAATGAAATAA", ["ATG", "ATGAAA"]),
+    # Check a strand with one ORF in each frame.
+    ("AATGGAATGAATTGATGTGA", ["ATGAAT", "ATGGAA", "ATG"]),
 ]
 
 find_all_orfs_both_strands_cases = [
     # Test a short strand starting with a start codon whose reverse complement
     # is itself. Thus this should return two copies of the same ORF.
     ("ATGCAT", ["ATGCAT", "ATGCAT"]),
+    # Test a strand with codons in multiple frames for itself
+    # and its reverse complement.
+    ("TCAATGAATGTGACTTGACAT", ["ATGAATGTGACT", "ATG", "ATGTCAAGTCACATTCAT"]),
 ]
 
 get_longest_orf_cases = [
     # An ORF covering the whole strand is by default the longest ORF.
     ("ATGAAAAAAAAA", "ATGAAAAAAAAA"),
+    # A strand with multiple ORFs.
+    ("ATGATGTGAATGTGA", "ATGATG"),
+    # A strand with the longest ORF in the reverse complement.
+    ("ATGTGATTAAAACAT", "ATGTTT")
 ]
 
 coding_strand_to_aa_cases = [
@@ -64,6 +90,8 @@ coding_strand_to_aa_cases = [
     ("ATG", "M"),
     # Check a case in which the length is not a multiple of 3.
     ("ATGCCCGCTTT", "MPA"),
+    # Check a case with only two nucleotides.
+    ("AA", ""),
 ]
 
 
